@@ -15,13 +15,7 @@ namespace PhotoOrganiser
             ServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             
-            //Point to a origin location
-            //Check for new files
-            //If present, copy to destination location
-            //If year folder present, open (if not create)
-            //If month folder present, open (if not create)
-            //Copy file(s) to folder
-            //Remove files from origin location when complete
+            
             Console.WriteLine("Hello World!");
         }
 
