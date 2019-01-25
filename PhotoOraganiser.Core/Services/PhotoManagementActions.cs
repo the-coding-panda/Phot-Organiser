@@ -1,15 +1,12 @@
-﻿using PhotoOraganiser.Core.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Text;
 
-namespace PhotoOraganiser.Core.Services
+namespace PhotoOraganiser.Core
 {
     public class PhotoManagementActions : IFolderActions
     {
-        
-        public void CopyFolderContents(string originLocation, string destinationLocation, bool removeAfterCopy)
+
+        public string[] CopyFolderContents(string originLocation, string destinationLocation, bool removeAfterCopy)
         {
             if (Directory.Exists(originLocation))
             {
@@ -22,11 +19,18 @@ namespace PhotoOraganiser.Core.Services
                     string fileName = Path.GetFileName(s);
                     string destFile = Path.Combine(destinationLocation, fileName);
                     File.Copy(s, destFile, true);
+
+                    if (removeAfterCopy)
+                    {
+                        File.Delete(s);
+                    }
                 }
+                return files;
             }
             else
             {
                 Console.WriteLine("Source path does not exist!");
+                return new string[0];
             }
         }
 
@@ -42,7 +46,7 @@ namespace PhotoOraganiser.Core.Services
             {
                 return false;
             }
-            
+
         }
 
         public bool FolderExist(DateTime dateTime)

@@ -1,38 +1,52 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Binder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
-using PhotoOraganiser.Core.Interfaces;
-using PhotoOraganiser.Core.Services;
+using PhotoOraganiser.Core;
+using System.Linq;
 
 namespace PhotoOrganiser
 {
-    class Program
+    public class Program
     {
-        public static IConfigurationRoot configuration;
-        private IFolderActions iFolderActions;
+        private static IFolderActions _iFolderActions;
 
         static void Main(string[] args)
         {
-            //Initialise
-            ServiceCollection serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
-            
-            
-            Console.WriteLine("Hello World!, here is a change");
+            //Initialise Services & Settings
+            ConfigureServices(new ServiceCollection());
+            var appSettings = ConfigureSettings();
+
+            //Copy Files
+            var files = _iFolderActions.CopyFolderContents(appSettings.OriginLocation, appSettings.DestinationLocation, true);
+            if (files.Any())
+            {
+                Console.WriteLine("Lets organise these new files.");
+            }
+
+            Console.WriteLine("Hello World!");
         }
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
             //setup our DI
-            serviceCollection.AddSingleton<IFolderActions, PhotoManagementActions>().BuildServiceProvider();
+            var provider = serviceCollection
+                .AddSingleton<IFolderActions, PhotoManagementActions>().BuildServiceProvider();
 
+            _iFolderActions = provider.GetService<IFolderActions>();
+        }
+
+        private static AppSettings ConfigureSettings()
+        {
             // Build configuration
-            configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
+
+            return configuration.GetSection("appSettings").Get<AppSettings>();
         }
 
     }
-    }
+}
