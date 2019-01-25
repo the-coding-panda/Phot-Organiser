@@ -23,6 +23,9 @@ namespace PhotoOrganiser
             if (files.Any())
             {
                 Console.WriteLine("Lets organise these new files.");
+                
+                _iFolderActions.CreateFolders(files, appSettings.DestinationLocation);
+                _iFolderActions.OrganiseFilesIntoFolders(appSettings.DestinationLocation);
             }
 
             Console.WriteLine("Hello World!");

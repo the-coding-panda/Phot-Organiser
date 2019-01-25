@@ -25,7 +25,7 @@ namespace PhotoOraganiser.Core
                         File.Delete(s);
                     }
                 }
-                return files;
+                return Directory.GetFiles(destinationLocation);
             }
             else
             {
@@ -34,24 +34,46 @@ namespace PhotoOraganiser.Core
             }
         }
 
-        public bool CreateFolder(string directory, DateTime dateTime)
+        public bool CreateFolders(string[] files, string destinationLocation)
         {
             try
             {
-                Path.Combine(directory, dateTime.Month.ToString());
-                Directory.CreateDirectory(directory);
+                foreach (var file in files)
+                {
+                    var info = new FileInfo(file);
+                    var created = info.CreationTime;
+
+                    //Year
+                    Directory.CreateDirectory(Path.Combine(destinationLocation, created.Year.ToString(), created.Month.ToString()));
+                    
+                }
+
                 return true;
+
             }
             catch (Exception)
             {
                 return false;
             }
-
         }
 
-        public bool FolderExist(DateTime dateTime)
+        public void OrganiseFilesIntoFolders(string destinationLocation)
         {
-            throw new NotImplementedException();
+            string[] fileEntries = Directory.GetFiles(destinationLocation);
+
+            foreach (string fileName in fileEntries)
+                MoveFileToFolder(destinationLocation, fileName);
+        }
+
+        private void MoveFileToFolder(string destinationLocation, string filePath)
+        {
+            var info = new FileInfo(filePath);
+            var created = info.CreationTime;
+            
+            string destFile = Path.Combine(destinationLocation, created.Year.ToString(), created.Month.ToString(), info.Name);
+            File.Move(filePath, destFile);
+
+
         }
     }
 }
