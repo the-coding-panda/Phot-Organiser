@@ -19,7 +19,7 @@ namespace PhotoOrganiser
             ConfigureServices(serviceCollection);
             
             
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hello World!, here is a change");
         }
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
