@@ -2,12 +2,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using PhotoOraganiser.Core.Interfaces;
+using PhotoOraganiser.Core.Services;
 
 namespace PhotoOrganiser
 {
     class Program
     {
         public static IConfigurationRoot configuration;
+        private IFolderActions iFolderActions;
 
         static void Main(string[] args)
         {
@@ -21,7 +24,9 @@ namespace PhotoOrganiser
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
-            
+            //setup our DI
+            serviceCollection.AddSingleton<IFolderActions, PhotoManagementActions>().BuildServiceProvider();
+
             // Build configuration
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PhotoOraganiser.Core.Interfaces
 {
-    interface IFolderActions
+    public interface IFolderActions
     {
         bool FolderExist(DateTime dateTime);
         bool CreateFolder(string directory, DateTime dateTime);
