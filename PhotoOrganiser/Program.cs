@@ -1,55 +1,52 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Binder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using PhotoOraganiser.Core;
-using System.Linq;
+using Serilog;
 
 namespace PhotoOrganiser
 {
     public class Program
     {
-        private static IFolderActions _iFolderActions;
-
         static void Main(string[] args)
         {
             //Initialise Services & Settings
-            ConfigureServices(new ServiceCollection());
-            var appSettings = ConfigureSettings();
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
 
-            //Copy Files
-            var files = _iFolderActions.CopyFolderContents(appSettings.OriginLocation, appSettings.DestinationLocation, true);
-            if (files.Any())
-            {
-                Console.WriteLine("Lets organise these new files.");
-                
-                _iFolderActions.CreateFolders(files, appSettings.DestinationLocation);
-                _iFolderActions.OrganiseFilesIntoFolders(appSettings.DestinationLocation);
-            }
+            // create service provider
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            Console.WriteLine("Hello World!");
+            // run app
+            serviceProvider.GetService<ProgramWorkflow>().Run();
         }
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
-            //setup our DI
-            var provider = serviceCollection
-                .AddSingleton<IFolderActions, PhotoManagementActions>().BuildServiceProvider();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(".\\logs\\logs.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
-            _iFolderActions = provider.GetService<IFolderActions>();
-        }
-
-        private static AppSettings ConfigureSettings()
-        {
-            // Build configuration
+            serviceCollection.AddLogging();
+            // build configuration
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            return configuration.GetSection("appSettings").Get<AppSettings>();
+            serviceCollection.AddOptions();
+            serviceCollection.Configure<AppSettings>(configuration.GetSection("AppSettings"));
+
+            // add services
+            serviceCollection.AddTransient<IFolderActions, PhotoManagementActions>();
+
+            // add app
+            serviceCollection.AddTransient<ProgramWorkflow>();
+
         }
+
 
     }
 }
