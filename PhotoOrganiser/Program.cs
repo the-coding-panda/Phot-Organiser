@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using PhotoOraganiser.Core;
 using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace PhotoOrganiser
 {
@@ -22,14 +23,15 @@ namespace PhotoOrganiser
             serviceProvider.GetService<ProgramWorkflow>().Run();
         }
 
-        private static void ConfigureServices(IServiceCollection serviceCollection)
+        private static void ConfigureServices(ServiceCollection serviceCollection)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File(".\\logs\\logs.txt", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            //Add Logging
+            serviceCollection.AddLogging(lb => 
+            {
+                lb.AddConsole();
+                lb.AddSerilog();
+            });
 
-            serviceCollection.AddLogging();
             // build configuration
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
@@ -39,11 +41,21 @@ namespace PhotoOrganiser
             serviceCollection.AddOptions();
             serviceCollection.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
+            //Initialse Logger
+            Log.Logger = new LoggerConfiguration()
+               .MinimumLevel.Debug()
+               .WriteTo.File(".\\logs\\logs.txt", rollingInterval: RollingInterval.Day)
+               .CreateLogger();
+
             // add services
             serviceCollection.AddTransient<IFolderActions, PhotoManagementActions>();
 
             // add app
             serviceCollection.AddTransient<ProgramWorkflow>();
+            
+            
+
+           
 
         }
 
