@@ -1,4 +1,4 @@
-# Phot-Organiser
+# 📸 Phot-Organiser
 
 [![Build Status](https://dev.azure.com/rain-dogs/Sort%20My%20Photos/_apis/build/status/the-coding-panda.Phot-Organiser?branchName=master)](https://dev.azure.com/rain-dogs/Sort%20My%20Photos/_build/latest?definitionId=7&branchName=master)
 
