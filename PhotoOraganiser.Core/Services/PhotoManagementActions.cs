@@ -80,9 +80,15 @@ namespace PhotoOraganiser.Core
             var created = info.LastWriteTime;
 
             string destFile = Path.Combine(destinationLocation, created.Year.ToString(), created.ToString("MMMM"), info.Name);
-            File.Move(filePath, destFile);
 
-
+            try
+            {
+                File.Move(filePath, destFile);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Could not copy file: {info.Name}");
+            }
         }
     }
 }
