@@ -83,7 +83,7 @@ namespace PhotoOraganiser.Core
 
             try
             {
-                File.Move(filePath, destFile);
+                File.Move(filePath, destFile, true);
             }
             catch (IOException ex)
             {
